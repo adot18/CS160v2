@@ -47,11 +47,11 @@
       {% if task.complete %}
       <div class="task-complete-icon"></div>
       <i
-        ><s><a href="{% url 'task-update' task.id %}">{{task}}</a></s></i
+        ><s><a href="{% url 'task-update' task.id %}">{{task}} - {{task.event_name}} {{task.division}}</a></s></i
       >
       {% else %}
       <div class="task-incomplete-icon"></div>
-      <a href="{% url 'task-update' task.id %}">{{task}}</a> {% endif %}
+      <a href="{% url 'task-update' task.id %}">{{task}} - {{task.event_name}} {{task.division}}</a> {% endif %}
     </div>
     <div class="task-controls">
       <a class="delete-link" href="{% url 'task-delete' task.id %}">&#215;</a>
