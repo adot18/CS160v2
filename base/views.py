@@ -14,7 +14,7 @@ from django.views import View
 from django.shortcuts import redirect
 from django.db import transaction
 
-from .models import Task
+from .models import Event
 from .forms import PositionForm
 
 
@@ -24,14 +24,14 @@ class CustomLoginView(LoginView):
     redirect_authenticated_user = True
 
     def get_success_url(self):
-        return reverse_lazy('tasks')
+        return reverse_lazy('events')
 
 
 class RegisterPage(FormView):
     template_name = 'base/register.html'
     form_class = UserCreationForm
     redirect_authenticated_user = True
-    success_url = reverse_lazy('tasks')
+    success_url = reverse_lazy('events')
 
     def form_valid(self, form):
         user = form.save()
@@ -41,24 +41,24 @@ class RegisterPage(FormView):
 
     def get(self, *args, **kwargs):
         if self.request.user.is_authenticated:
-            return redirect('tasks')
+            return redirect('events')
         return super(RegisterPage, self).get(*args, **kwargs)
 
 
-class TaskList(LoginRequiredMixin, ListView):
-    model = Task
-    context_object_name = 'tasks'
+class EventList(LoginRequiredMixin, ListView):
+    model = Event
+    context_object_name = 'events'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['tasks'] = context['tasks'].filter(user=self.request.user)
-        context['count'] = context['tasks'].filter(complete=False).count()
+        context['events'] = context['events'].filter(user=self.request.user)
+        context['count'] = context['events'].filter(complete=False).count()
 
         search_input = self.request.GET.get('search-area') or ''
         if search_input:
-            context['tasks'] = context['tasks'].filter(
-                competitor_name__contains=search_input) | context['tasks'].filter(
-                division__contains=search_input) | context['tasks'].filter(
+            context['events'] = context['events'].filter(
+                competitor_name__contains=search_input) | context['events'].filter(
+                division__contains=search_input) | context['events'].filter(
                 event_name__contains=search_input)
 
         context['search_input'] = search_input
@@ -66,37 +66,37 @@ class TaskList(LoginRequiredMixin, ListView):
         return context
 
 
-class TaskDetail(LoginRequiredMixin, DetailView):
-    model = Task
-    context_object_name = 'task'
-    template_name = 'base/task.html'
+class EventDetail(LoginRequiredMixin, DetailView):
+    model = Event
+    context_object_name = 'event'
+    template_name = 'base/event.html'
 
 
-class TaskCreate(LoginRequiredMixin, CreateView):
-    model = Task
+class EventCreate(LoginRequiredMixin, CreateView):
+    model = Event
     fields = ['competitor_name', 'event_name', 'division', 'ring', 'competitors', 'results', 'complete']
-    success_url = reverse_lazy('tasks')
+    success_url = reverse_lazy('events')
 
     def form_valid(self, form):
         form.instance.user = self.request.user
-        return super(TaskCreate, self).form_valid(form)
+        return super(EventCreate, self).form_valid(form)
 
 
-class TaskUpdate(LoginRequiredMixin, UpdateView):
-    model = Task
+class EventUpdate(LoginRequiredMixin, UpdateView):
+    model = Event
     fields = ['competitor_name', 'event_name', 'division', 'ring', 'competitors', 'results', 'complete']
-    success_url = reverse_lazy('tasks')
+    success_url = reverse_lazy('events')
 
 
 class DeleteView(LoginRequiredMixin, DeleteView):
-    model = Task
-    context_object_name = 'task'
-    success_url = reverse_lazy('tasks')
+    model = Event
+    context_object_name = 'event'
+    success_url = reverse_lazy('events')
     def get_queryset(self):
         owner = self.request.user
         return self.model.objects.filter(user=owner)
 
-class TaskReorder(View):
+class EventReorder(View):
     def post(self, request):
         form = PositionForm(request.POST)
 
@@ -104,6 +104,6 @@ class TaskReorder(View):
             positionList = form.cleaned_data["position"].split(',')
 
             with transaction.atomic():
-                self.request.user.set_task_order(positionList)
+                self.request.user.set_event_order(positionList)
 
-        return redirect(reverse_lazy('tasks'))
+        return redirect(reverse_lazy('events'))

@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import TaskList, TaskDetail, TaskCreate, TaskUpdate, DeleteView, CustomLoginView, RegisterPage, TaskReorder
+from .views import EventList, EventDetail, EventCreate, EventUpdate, DeleteView, CustomLoginView, RegisterPage, EventReorder
 from django.contrib.auth.views import LogoutView
 
 urlpatterns = [
@@ -7,10 +7,10 @@ urlpatterns = [
     path('logout/', LogoutView.as_view(next_page='login'), name='logout'),
     path('register/', RegisterPage.as_view(), name='register'),
 
-    path('', TaskList.as_view(), name='tasks'),
-    path('task/<int:pk>/', TaskDetail.as_view(), name='task'),
-    path('task-create/', TaskCreate.as_view(), name='task-create'),
-    path('task-update/<int:pk>/', TaskUpdate.as_view(), name='task-update'),
-    path('task-delete/<int:pk>/', DeleteView.as_view(), name='task-delete'),
-    path('task-reorder/', TaskReorder.as_view(), name='task-reorder'),
+    path('', EventList.as_view(), name='events'),
+    path('event/<int:pk>/', EventDetail.as_view(), name='event'),
+    path('event-create/', EventCreate.as_view(), name='event-create'),
+    path('event-update/<int:pk>/', EventUpdate.as_view(), name='event-update'),
+    path('event-delete/<int:pk>/', DeleteView.as_view(), name='event-delete'),
+    path('event-reorder/', EventReorder.as_view(), name='event-reorder'),
 ]
